@@ -24,10 +24,11 @@ import React, { useState, useEffect } from 'react';
       };
 
       return (
-        <div className="container">
+        <div className="container" >
+          <br></br>
           <div className="level">
             <div className="level-left">
-              <h1 className="title is-1">To-Do List</h1>
+              <h1 className="title is-1" style={{fontFamily:'Permanent Marker'}}>To-Do List</h1>
             </div>
           </div>
           <TaskForm onAddTask={addTask} />
@@ -118,7 +119,7 @@ import React, { useState, useEffect } from 'react';
       };
 
       return (
-        <li className="box task-item">
+        <li className="box task-item" >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {isEditing ? (
               <div className="field is-grouped" style={{ flex: 1 }}>
