@@ -64,7 +64,7 @@ import React, { useState, useEffect } from 'react';
               />
             </div>
           </div>
-          <button className="button is-primary" type="submit">Add Task</button>
+          <button className="button is-primary is-outlined is-light is-rounded" type="submit">Add Task</button>
         </form>
       );
     }
@@ -119,35 +119,38 @@ import React, { useState, useEffect } from 'react';
 
       return (
         <li className="box task-item">
-          {isEditing ? (
-            <div className="field is-grouped">
-              <div className="control is-expanded">
-                <input
-                  className="input"
-                  type="text"
-                  value={editedTaskName}
-                  onChange={(e) => setEditedTaskName(e.target.value)}
-                />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {isEditing ? (
+              <div className="field is-grouped" style={{ flex: 1 }}>
+                <div className="control is-expanded">
+                  <input
+                    className="input"
+                    type="text"
+                    value={editedTaskName}
+                    onChange={(e) => setEditedTaskName(e.target.value)}
+                  />
+                </div>
+                <div className="control">
+                  <button className="button is-primary is-outlined is-light is-rounded" onClick={handleSaveTask}>Save</button>
+                  <button className="button is-rounded" onClick={handleCancelEdit}>Cancel</button>
+                </div>
               </div>
-              <div className="control">
-                <button className="button is-success" onClick={handleSaveTask}>Save</button>
-                <button className="button" onClick={handleCancelEdit}>Cancel</button>
+            ) : (
+              <h3 className="title is-4" style={{ flex: 1, marginRight: '10px' }}>{index + 1}. {task.name}</h3>
+            )}
+            {!isEditing && (
+              <div className="task-actions" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="button is-rounded is-small" onClick={handleEditTask}>&#9998;</button>
+                <button className="button is-rounded is-small is-danger" onClick={() => onDeleteTask(task.id)}>&#10006;</button>
               </div>
-            </div>
-          ) : (
-            <h3 className="title is-4">{index + 1}. {task.name}</h3>
-          )}
-          {!isEditing && (
-            <div className="task-actions" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="button is-small" onClick={handleEditTask}>&#9998;</button>
-              <button className="button is-small is-danger" onClick={() => onDeleteTask(task.id)}>&#10006;</button>
-            </div>
-          )}
-          <div className="add-subtask-container" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <button className="button is-success is-small" onClick={() => setShowSubtaskForm(!showSubtaskForm)}>
+            )}
+          </div>
+          <div className="add-subtask-container" style={{ display: 'flex', marginTop: '10px' }}>
+            <button className="button is-primary is-outlined is-light is-rounded is-small" onClick={() => setShowSubtaskForm(!showSubtaskForm)}>
               {showSubtaskForm ? 'Hide Subtask Form' : 'Add Subtask'}
             </button>
           </div>
+          <br></br>
           {showSubtaskForm && <SubtaskForm onAddSubtask={addSubtask} />}
           <SubtaskList subtasks={subtasks} onUpdateSubtask={updateSubtask} onDeleteSubtask={deleteSubtask} />
         </li>
@@ -368,8 +371,8 @@ import React, { useState, useEffect } from 'react';
                 />
               </div>
               <div className="control">
-                <button className="button is-success" onClick={handleSaveSubtask}>Save</button>
-                <button className="button" onClick={handleCancelEdit}>Cancel</button>
+                <button className="button is-primary is-outlined is-light is-rounded" onClick={handleSaveSubtask}>Save</button>
+                <button className="button is-rounded " onClick={handleCancelEdit}>Cancel</button>
               </div>
             </div>
           ) : (
@@ -381,14 +384,24 @@ import React, { useState, useEffect } from 'react';
                     <div className="time-details">
                       {subtask.startTime && subtask.endTime && (
                         <p className="time-range">
-                          {formatDateTime(subtask.startTime)} - {formatDateTime(subtask.endTime)}
+                          <b>{formatDateTime(subtask.startTime)} - {formatDateTime(subtask.endTime)}</b>
                         </p>
                       )}
                     </div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {isActive && <span className="timer-text">{formatTime(remainingTime)}</span>}
+                  {isActive && <span className="timer-text" style={{
+                    backgroundColor: '#bbbbbb',
+                    color: '#ffffff',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '0.9em',
+                    fontWeight: 'bold',
+                    marginLeft: '8px',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                  }}>{formatTime(remainingTime)}</span>}
                   <div className="toggle-container">
                     <input
                       type="checkbox"
@@ -404,8 +417,8 @@ import React, { useState, useEffect } from 'react';
           )}
           {!isEditing && (
             <div className="subtask-actions">
-              <button className="button is-small" onClick={handleEditSubtask}>&#9998;</button>
-              <button className="button is-small is-danger" onClick={() => onDeleteSubtask(subtask.id)}>&#10006;</button>
+              <button className="button is-rounded is-small" onClick={handleEditSubtask}>&#9998;</button>
+              <button className="button is-rounded is-small is-danger" onClick={() => onDeleteSubtask(subtask.id)}>&#10006;</button>
             </div>
           )}
         </li>
