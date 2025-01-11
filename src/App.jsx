@@ -23,12 +23,74 @@ import React, { useState, useEffect } from 'react';
         setTasks(tasks.filter(task => task.id !== taskId));
       };
 
+      const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
+      const [isPomodoroActive, setIsPomodoroActive] = useState(false);
+      const [pomodoroIntervalId, setPomodoroIntervalId] = useState(null);
+
+      const startPomodoro = () => {
+        setIsPomodoroActive(true);
+        setPomodoroTime(25 * 60);
+        const intervalId = setInterval(() => {
+          setPomodoroTime((prevTime) => {
+            if (prevTime <= 0) {
+              clearInterval(intervalId);
+              setIsPomodoroActive(false);
+              alert('Pomodoro timer is complete!');
+              return 0;
+            }
+            return prevTime - 1;
+          });
+        }, 1000);
+        setPomodoroIntervalId(intervalId);
+      };
+
+      const stopPomodoro = () => {
+        clearInterval(pomodoroIntervalId);
+        setIsPomodoroActive(false);
+      };
+
+      const resetPomodoro = () => {
+        clearInterval(pomodoroIntervalId);
+        setIsPomodoroActive(false);
+        setPomodoroTime(25 * 60);
+      };
+
+      const formatTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      };
+
       return (
         <div className="container" >
           <br></br>
           <div className="level">
             <div className="level-left">
               <h1 className="title is-1" style={{fontFamily:'Permanent Marker'}}>To-Do List</h1>
+            </div>
+            <div className="level-right">
+              <div className="pomodoro-timer" style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                <span className="timer-text" style={{
+                  backgroundColor: '#bbbbbb',
+                  color: '#ffffff',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '0.9em',
+                  fontWeight: 'bold',
+                  marginLeft: '8px',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                }}>{formatTime(pomodoroTime)}</span>
+                {!isPomodoroActive ? (
+                  <button className="button is-small is-rounded" onClick={startPomodoro}>Start Pomodoro</button>
+                ) : (
+                  <>
+                    <button className="button is-small is-rounded" onClick={stopPomodoro}>Stop</button>
+                    <button className="button is-small is-rounded" onClick={resetPomodoro}>Reset</button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <TaskForm onAddTask={addTask} />
@@ -237,6 +299,7 @@ import React, { useState, useEffect } from 'react';
       const [remainingTime, setRemainingTime] = useState(0);
       const [isActive, setIsActive] = useState(false);
       const [backgroundColor, setBackgroundColor] = useState('white');
+      const [previousCompleted, setPreviousCompleted] = useState(subtask.completed);
 
       const handleToggleComplete = () => {
         const updatedSubtask = { ...subtask, completed: !subtask.completed };
@@ -307,7 +370,7 @@ import React, { useState, useEffect } from 'react';
               clearInterval(intervalId);
             };
           } else if (end <= now) {
-            setBackgroundColor('#ffe0b2');
+             setBackgroundColor('#ffe0b2');
             setIsActive(false);
             clearInterval(intervalId);
           }
@@ -318,8 +381,33 @@ import React, { useState, useEffect } from 'react';
       useEffect(() => {
         if (subtask.completed) {
           setBackgroundColor('#e6ffe6');
+        } else if (!subtask.completed && !isActive) {
+          const end = subtask.endTime ? new Date(subtask.endTime).getTime() : null;
+          const now = new Date().getTime();
+          if (end && end <= now) {
+            setBackgroundColor('#ffe0b2');
+          } else {
+            setBackgroundColor('white');
+          }
         }
-      }, [subtask.completed]);
+      }, [subtask.completed, isActive, subtask.endTime]);
+
+      useEffect(() => {
+        if (subtask.completed !== previousCompleted) {
+          if (!subtask.completed) {
+            const end = subtask.endTime ? new Date(subtask.endTime).getTime() : null;
+            const now = new Date().getTime();
+             if (end && end <= now) {
+              setBackgroundColor('#ffe0b2');
+            } else if (!end) {
+              setBackgroundColor('#ffe0b2');
+            } else {
+              setBackgroundColor('white');
+            }
+          }
+          setPreviousCompleted(subtask.completed);
+        }
+      }, [subtask.completed, previousCompleted, subtask.endTime]);
 
       const formatTime = (seconds) => {
         const hours = Math.floor(seconds / 3600);
