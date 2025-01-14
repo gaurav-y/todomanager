@@ -73,3 +73,44 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+    body.dark-mode {
+      background-color: #222;
+      color: #fff;
+    }
+
+    .dark-mode .box {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .dark-mode .input {
+      background-color: #444;
+      color: #fff;
+    }
+
+    .dark-mode .title {
+      color: #fff;
+    }
+
+    .dark-mode .task-item {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .dark-mode .subtask-item {
+      background-color: #444;
+      color: #fff;
+    }
+
+    .dark-mode .button {
+      color: #fff;
+    }
+    .dark-mode .button.is-rounded.is-small,
+    .dark-mode .button.is-small.is-rounded,
+    .dark-mode .button.is-small.is-rounded:not(.is-danger) {
+      color: black;
+    }
+    .button.is-rounded.is-small.is-danger,
+    .dark-mode .button.is-rounded.is-small.is-danger {
+      color: white;
+    }

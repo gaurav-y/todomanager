@@ -62,6 +62,24 @@ import React, { useState, useEffect } from 'react';
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
       };
 
+      const [darkMode, setDarkMode] = useState(() => {
+        const savedMode = localStorage.getItem('darkMode');
+        return savedMode === 'true' || false;
+      });
+
+      useEffect(() => {
+        localStorage.setItem('darkMode', JSON.stringify(darkMode));
+        if (darkMode) {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+      }, [darkMode]);
+
+      const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+      };
+
       return (
         <div className="container" >
           <br></br>
@@ -90,6 +108,9 @@ import React, { useState, useEffect } from 'react';
                     <button className="button is-small is-rounded" onClick={resetPomodoro}>Reset</button>
                   </>
                 )}
+                <button className="button is-small is-rounded" onClick={toggleDarkMode}>
+                  {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </button>
               </div>
             </div>
           </div>
@@ -147,6 +168,7 @@ import React, { useState, useEffect } from 'react';
       const [showSubtaskForm, setShowSubtaskForm] = useState(false);
       const [isEditing, setIsEditing] = useState(false);
       const [editedTaskName, setEditedTaskName] = useState(task.name);
+      const [hideCompleted, setHideCompleted] = useState(false);
 
       useEffect(() => {
         onUpdateTask({ ...task, subtasks });
@@ -178,6 +200,10 @@ import React, { useState, useEffect } from 'react';
       const handleCancelEdit = () => {
         setEditedTaskName(task.name);
         setIsEditing(false);
+        };
+
+      const toggleHideCompleted = () => {
+        setHideCompleted(!hideCompleted);
       };
 
       return (
@@ -208,14 +234,17 @@ import React, { useState, useEffect } from 'react';
               </div>
             )}
           </div>
-          <div className="add-subtask-container" style={{ display: 'flex', marginTop: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
             <button className="button is-primary is-outlined is-light is-rounded is-small" onClick={() => setShowSubtaskForm(!showSubtaskForm)}>
               {showSubtaskForm ? 'Hide Subtask Form' : 'Add Subtask'}
+            </button>
+            <button className="button is-small is-rounded" onClick={toggleHideCompleted}>
+              {hideCompleted ? 'Show Completed' : 'Hide Completed'}
             </button>
           </div>
           <br></br>
           {showSubtaskForm && <SubtaskForm onAddSubtask={addSubtask} />}
-          <SubtaskList subtasks={subtasks} onUpdateSubtask={updateSubtask} onDeleteSubtask={deleteSubtask} />
+          <SubtaskList subtasks={subtasks} onUpdateSubtask={updateSubtask} onDeleteSubtask={deleteSubtask} hideCompleted={hideCompleted} setHideCompleted={setHideCompleted} />
         </li>
       );
     }
@@ -281,17 +310,18 @@ import React, { useState, useEffect } from 'react';
       );
     }
 
-    function SubtaskList({ subtasks, onUpdateSubtask, onDeleteSubtask }) {
+    function SubtaskList({ subtasks, onUpdateSubtask, onDeleteSubtask, hideCompleted, setHideCompleted }) {
+      const filteredSubtasks = hideCompleted ? subtasks.filter(subtask => !subtask.completed) : subtasks;
       return (
         <ul className="subtask-list">
-          {subtasks.map((subtask) => (
-            <Subtask key={subtask.id} subtask={subtask} onUpdateSubtask={onUpdateSubtask} onDeleteSubtask={onDeleteSubtask} />
+          {filteredSubtasks.map((subtask) => (
+            <Subtask key={subtask.id} subtask={subtask} onUpdateSubtask={onUpdateSubtask} onDeleteSubtask={onDeleteSubtask} setHideCompleted={setHideCompleted} />
           ))}
         </ul>
       );
     }
 
-    function Subtask({ subtask, onUpdateSubtask, onDeleteSubtask }) {
+    function Subtask({ subtask, onUpdateSubtask, onDeleteSubtask, setHideCompleted }) {
       const [isEditing, setIsEditing] = useState(false);
       const [editedSubtaskName, setEditedSubtaskName] = useState(subtask.name);
       const [editedStartTime, setEditedStartTime] = useState(subtask.startTime);
@@ -304,6 +334,7 @@ import React, { useState, useEffect } from 'react';
       const handleToggleComplete = () => {
         const updatedSubtask = { ...subtask, completed: !subtask.completed };
         onUpdateSubtask(updatedSubtask);
+        setHideCompleted(true);
       };
 
       const handleEditSubtask = () => {
